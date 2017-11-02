@@ -44,4 +44,15 @@ public static class Services {
 		}
 		set { score = value; }
 	}
+
+
+	//provides system for handling work done over time
+	private static TaskManager tasks;
+	public static TaskManager Tasks {
+		get {
+			Debug.Assert(tasks != null, "No task manager. Are services being created in the wrong order?");
+			return tasks;
+		}
+		set { tasks = value; }
+	}
 }

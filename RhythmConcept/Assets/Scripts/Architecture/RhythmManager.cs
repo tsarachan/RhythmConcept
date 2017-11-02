@@ -113,7 +113,7 @@ public class RhythmManager {
 		public float shrinkTime; //how long, in seconds, it will take the timer image's width and height to go from FULL_SIZE to ZERO.
 		public float timer;
 		public const float FULL_SIZE = 5000.0f;
-		public const float BUTTON_SIZE = 400.0f;
+		public const float BUTTON_SIZE = 375.0f;
 		public const float ZERO = 0.0f;
 
 
