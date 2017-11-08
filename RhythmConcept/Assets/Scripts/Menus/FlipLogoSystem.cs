@@ -9,8 +9,8 @@ public class FlipLogoSystem: MonoBehaviour {
 	////////////////////////////////////////////////
 
 
-	//the main menu, to load as the next scene
-	private const string MENU_SCENE = "Main menu";
+	//the next scene to load
+	private const string NEXT_SCENE = "Measure visual latency";
 
 
 	////////////////////////////////////////////////
@@ -46,9 +46,9 @@ public class FlipLogoSystem: MonoBehaviour {
 
 
 	/// <summary>
-	/// When the player presses the second logo, load the main menu.
+	/// When the player presses the second logo, load the next scene.
 	/// </summary>
 	public void GoToMenu(){
-		SceneManager.LoadScene(MENU_SCENE);
+		SceneManager.LoadScene(NEXT_SCENE);
 	}
 }
