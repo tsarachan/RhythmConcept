@@ -28,11 +28,11 @@ public class BeatCounter {
 	private double lastBeatTime = 0.0f; //when did the last beat start?
 	private double beatDuration = 0.0f; //how long is a beat, in seconds?
 	public double Bpm { get; set; } //must be manually set for the track
-	private const float SECONDS_IN_MINUTE = 60.0f;
+	public const float SECONDS_IN_MINUTE = 60.0f;
 
 
 	//what beat is the song on?
-	int beatCounter = 0;
+	public int BeatCount { get; private set; }
 
 
 	////////////////////////////////////////////////
@@ -44,6 +44,7 @@ public class BeatCounter {
 	public void Init(){
 		speaker = GameObject.Find(SPEAKER_OBJ).GetComponent<AudioSource>();
 		Bpm = 60.0f; //for testing purposes
+		BeatCount = 0;
 
 		StartSong(startPlayDelay);
 	}
@@ -79,9 +80,10 @@ public class BeatCounter {
 		songTime = GetCurrentSongTime();
 
 		if (songTime - startTime >= lastBeatTime + beatDuration){
-			Services.Events.Fire(new BeatEvent(beatCounter));
-			lastBeatTime = (beatCounter * 1.0f);
-			beatCounter++;
+			Debug.Log("Beat " + BeatCount);
+			Services.Events.Fire(new BeatEvent(BeatCount));
+			lastBeatTime = (BeatCount * 1.0f + startPlayDelay);
+			BeatCount++;
 		}
 	}
 

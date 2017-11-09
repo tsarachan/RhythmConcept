@@ -61,7 +61,7 @@ public static class Services {
 	private static BeatCounter beats;
 	public static BeatCounter Beats {
 		get {
-			Debug.Assert(beats != null, "No beat manager. Are services being created in the wrong order?");
+			Debug.Assert(beats != null, "No beat counter. Are services being created in the wrong order?");
 			return beats;
 		}
 		set { beats = value; }

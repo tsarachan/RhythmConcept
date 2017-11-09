@@ -20,10 +20,10 @@ public class GameManager : MonoBehaviour {
 		Services.Events = new EventManager();
 		Services.Score = new ScoreManager();
 		Services.Score.Init();
-		Services.Rhythm = new RhythmManager();
-		Services.Rhythm.Init();
 		Services.Beats = new BeatCounter();
 		Services.Beats.Init();
+		Services.Rhythm = new RhythmManager();
+		Services.Rhythm.Init();
 	}
 
 

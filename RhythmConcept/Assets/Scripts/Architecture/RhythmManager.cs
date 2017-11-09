@@ -27,14 +27,22 @@ public class RhythmManager {
 	private const string BUTTON_OBJ = "Button";
 
 
+	#region testing
+
+	private int everyXthBeat = 2; //the game will trigger a button every Xth beat
+
+	#endregion
+
+
 	////////////////////////////////////////////////
 	/// Functions
 	////////////////////////////////////////////////
 
 
-	//initialize variables and start listening for button presses
+	//initialize variables and start listening for events
 	public void Init(){
 		Services.Events.Register<ButtonPressedEvent>(HandleButtonPress);
+		Services.Events.Register<BeatEvent>(HandleBeat);
 
 
 		//create buttons
@@ -44,9 +52,6 @@ public class RhythmManager {
 			buttons.Add(buttonNum, new RhythmButton(buttonNum,
 													button.Find(TIMER_IMAGE_OBJ).GetComponent<Image>()));
 		}
-
-		//for testing purposes, start button 1
-		SetButton(buttons[2], 3.0f);
 	}
 
 
@@ -54,7 +59,7 @@ public class RhythmManager {
 	/// Each frame, check all the buttons. If a button is ticking down in size, tick it again.
 	/// </summary>
 	public void Tick(){
-		foreach (RhythmButton button in buttons.Values) if (button.timer > 0.0f) button.timerImage.rectTransform.sizeDelta = ShrinkButton(button);
+		foreach (RhythmButton button in buttons.Values) if (button.timer >= 0.0f) button.timerImage.rectTransform.sizeDelta = ShrinkButton(button);
 	}
 
 
@@ -63,10 +68,22 @@ public class RhythmManager {
 	/// </summary>
 	/// <param name="button">Button.</param>
 	/// <param name="time">Time.</param>
-	private void SetButton(RhythmButton button, float time){
-		button.shrinkTime = time;
-		button.timer = time;
+	private void SetButton(RhythmButton button, int beats){
+		button.shrinkBeats = beats;
+		button.timer = (float)(BeatCounter.SECONDS_IN_MINUTE/Services.Beats.Bpm) * beats;
 		button.timerImage.rectTransform.sizeDelta = new Vector2(RhythmButton.FULL_SIZE, RhythmButton.FULL_SIZE);
+	}
+
+
+	/// <summary>
+	/// Executes SetButton for a random button.
+	/// </summary>
+	private void SetRandomButton(){
+		List<int> buttonKeys = new List<int>();
+
+		foreach (int key in buttons.Keys) buttonKeys.Add(key);
+
+		SetButton(buttons[buttonKeys[Random.Range(0, buttonKeys.Count)]], 1);
 	}
 
 
@@ -78,9 +95,16 @@ public class RhythmManager {
 	private Vector2 ShrinkButton(RhythmButton button){
 		button.timer -= Time.deltaTime;
 
-		float newSize = Mathf.Lerp(RhythmButton.ZERO, RhythmButton.FULL_SIZE, button.timer/button.shrinkTime);
+		if (button.timer >= 0.0f){
+			float newSize = Mathf.Lerp(RhythmButton.BUTTON_SIZE,
+									   RhythmButton.FULL_SIZE,
+									   button.timer/(float)((BeatCounter.SECONDS_IN_MINUTE/Services.Beats.Bpm) * button.shrinkBeats));
 
-		return new Vector2(newSize, newSize);
+			return new Vector2(newSize, newSize);
+		} else {
+			Services.Events.Fire(new ScoreEvent(-1.0f)); //if the button is shrinking to zero, the player has missed the press
+			return new Vector2(RhythmButton.ZERO, RhythmButton.ZERO);
+		}
 	}
 
 
@@ -104,13 +128,24 @@ public class RhythmManager {
 
 
 	/// <summary>
+	/// Everything that happens on a beat is dealt with here.
+	/// </summary>
+	/// <param name="e">A BeatEvent sent out by BeatCounter.</param>
+	private void HandleBeat(Event e){
+		Debug.Assert(e.GetType() == typeof(BeatEvent), "Non-BeatEvent in HandleBeat.");
+
+		if (Services.Beats.BeatCount%everyXthBeat == 0) SetRandomButton();
+	}
+
+
+	/// <summary>
 	/// Class for the buttons players press. Puts information relating to these buttons in one place to keep
 	/// button-related information organized.
 	/// </summary>
 	private class RhythmButton {
 		public readonly int number;
 		public readonly Image timerImage;
-		public float shrinkTime; //how long, in seconds, it will take the timer image's width and height to go from FULL_SIZE to ZERO.
+		public int shrinkBeats; //how long, in beats, it will take the timer image's width and height to go from FULL_SIZE to BUTTON_SIZE.
 		public float timer;
 		public const float FULL_SIZE = 5000.0f;
 		public const float BUTTON_SIZE = 375.0f;
@@ -124,7 +159,7 @@ public class RhythmManager {
 
 
 			//default initializations
-			shrinkTime = 0.0f;
+			shrinkBeats = 1;
 			timer = 0.0f;
 		}
 
