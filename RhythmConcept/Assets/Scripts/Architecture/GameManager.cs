@@ -22,6 +22,8 @@ public class GameManager : MonoBehaviour {
 		Services.Score.Init();
 		Services.Rhythm = new RhythmManager();
 		Services.Rhythm.Init();
+		Services.Beats = new BeatCounter();
+		Services.Beats.Init();
 	}
 
 
@@ -30,6 +32,7 @@ public class GameManager : MonoBehaviour {
 	/// updates itself.
 	/// </summary>
 	private void Update(){
+		Services.Beats.Tick();
 		Services.Rhythm.Tick();
 	}
 }

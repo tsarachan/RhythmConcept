@@ -55,4 +55,15 @@ public static class Services {
 		}
 		set { tasks = value; }
 	}
+
+
+	//counts beats
+	private static BeatCounter beats;
+	public static BeatCounter Beats {
+		get {
+			Debug.Assert(beats != null, "No beat manager. Are services being created in the wrong order?");
+			return beats;
+		}
+		set { beats = value; }
+	}
 }

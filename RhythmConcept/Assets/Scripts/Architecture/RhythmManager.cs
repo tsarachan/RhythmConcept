@@ -1,6 +1,6 @@
 ﻿/*
  * 
- * The RhythmManager keeps track of buttons, and determiens whether they're being pushed on-beat.
+ * The RhythmManager keeps track of buttons, and determines whether they're being pushed on-beat.
  * 
  * To create a new button, just copy one of the existing buttons in the inspector. Give it a new name that ends
  * in an int 0-9, and then go to its "Button" child object and change the number in "OnClick ()" (under the Button (Script) component)

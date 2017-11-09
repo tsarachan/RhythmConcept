@@ -578,6 +578,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1066798401}
   - component: {fileID: 1066798402}
+  - component: {fileID: 1066798403}
   m_Layer: 0
   m_Name: Scene manager
   m_TagString: Untagged
@@ -607,6 +608,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4335991cab15b4e6e8e5c36b12cef914, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1066798403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1066798400}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2064f989f019b4fef8b19c7708da4f19, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!224 &1126071275 stripped

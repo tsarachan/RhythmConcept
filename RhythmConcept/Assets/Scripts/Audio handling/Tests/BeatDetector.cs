@@ -22,11 +22,13 @@ namespace Test
 
 
 		//delay before the song starts
-		private double startPlayDelay = 0.0f;
+		private double startPlayDelay = 2.0f;
+		private float delayTimer = 0.0f;
 
 
 		//audio time
-		private double songTime = 0.0f; //how far we are through the song
+		private double songTime = 0.0f; //how far we are through the song, in seconds
+		private double startTime = 0.0f; //the audio system time when the song starts
 		private double lastReportedAudioTime = 0.0f; //audio system time
 		private double lastBeatTime = 0.0f; //when did the last beat start?
 		private double beatDuration = 0.0f; //how long is a beat, in seconds?
@@ -34,16 +36,13 @@ namespace Test
 		private const float SECONDS_IN_MINUTE = 60.0f;
 
 
-
-
-		//the cube being used for tests
-		private ColorChanger cube;
-		private const string CUBE_OBJ = "Test cube";
-
-
 		//UI
 		private Image timerCircle;
 		private const string CIRCLE_OBJ = "Helper fill";
+
+
+		//what beat is the song on?
+		int beatCounter = 0;
 
 
 		////////////////////////////////////////////////
@@ -54,7 +53,6 @@ namespace Test
 		//initialize variables
 		private void Start(){
 			speaker = GameObject.Find(SPEAKER_OBJ).GetComponent<AudioSource>();
-			cube = GameObject.Find(CUBE_OBJ).GetComponent<ColorChanger>();
 			timerCircle = GameObject.Find(CIRCLE_OBJ).GetComponent<Image>();
 
 			StartSong(startPlayDelay);
@@ -66,26 +64,35 @@ namespace Test
 		/// </summary>
 		/// <param name="delay">Delay before starting the song, in seconds.</param>
 		private void StartSong(double delay){
+			startTime = AudioSettings.dspTime;
+			songTime = AudioSettings.dspTime + delay;
 			lastReportedAudioTime = AudioSettings.dspTime;
-			lastBeatTime = (double)Time.time + delay;
+			lastBeatTime = 0.0f;
 			beatDuration = SECONDS_IN_MINUTE/bpm;
-			speaker.Play();
+			speaker.PlayScheduled(AudioSettings.dspTime + startPlayDelay);
 		}
 
 
 		/// <summary>
-		/// Each frame, determine where we are in the song (in milliseconds). Provide appropriate feedback.
+		/// Each frame, determine where we are in the song (in seconds). Provide appropriate feedback.
 		/// 
 		/// If the song has reached a new beat, change the cube's color and update when the last beat occurred so that
 		/// we can detect the next beat.
 		/// </summary>
 		private void Update(){
-			songTime = GetCurrentSongTime();
-			timerCircle.fillAmount = (float)((songTime - lastBeatTime)/beatDuration);
+			//don't do anything until the song starts playing
+			if (delayTimer < startPlayDelay){
+				delayTimer += Time.deltaTime;
+				return;
+			}
 
-			if (songTime >= lastBeatTime + beatDuration){
-				cube.ChangeColor();
-				lastBeatTime = songTime;
+			songTime = GetCurrentSongTime();
+			timerCircle.fillAmount = (float)((songTime - startTime - lastBeatTime)/beatDuration);
+
+			if (songTime - startTime >= lastBeatTime + beatDuration){
+				Services.Events.Fire(new BeatEvent(beatCounter));
+				lastBeatTime = (beatCounter * 1.0f);
+				beatCounter++;
 			}
 		}
 
@@ -102,12 +109,11 @@ namespace Test
 
 
 			//when there's current information from the audio system, average its reported time with
-			//the time fromt the game timer in order to get as close as possible to the actual time of the
+			//the time from the game timer in order to get as close as possible to the actual time of the
 			//audio track
 			if (AudioSettings.dspTime != lastReportedAudioTime){
 				temp = (songTime + AudioSettings.dspTime)/2.0f;
 				lastReportedAudioTime = AudioSettings.dspTime;
-				Debug.Log("temp == " + temp + ", lastReportedAudioTime == " + lastReportedAudioTime);
 			}
 
 

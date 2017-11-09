@@ -30,13 +30,16 @@
 		private void Start(){
 			mat = GetComponent<Renderer>().material;
 			mat.color = colors[0];
+			Services.Events.Register<BeatEvent>(ChangeColor);
 		}
 
 
 		/// <summary>
 		/// Cycle through colors
 		/// </summary>
-		public void ChangeColor(){
+		private void ChangeColor(global::Event e){
+			Debug.Assert(e.GetType() == typeof(BeatEvent), "Non-BeatEvent in ChangeColor()");
+
 			index++;
 
 			if (index > colors.Length - 1) index = 0;

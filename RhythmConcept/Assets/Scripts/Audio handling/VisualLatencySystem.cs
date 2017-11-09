@@ -17,11 +17,6 @@ public class VisualLatencySystem : MonoBehaviour {
 	public static float VisualLatency { get; private set; }
 
 
-	//the cube the player will tap in time with
-	private Test.ColorChanger cube;
-	private const string CUBE = "Test cube";
-
-
 	//used to test visual latency
 	private const int TOTAL_LATENCIES_NEEDED = 15; //how many latencies will be collected
 	private const float CHANGE_PERIOD = 1.0f; //time between signals to click
@@ -52,7 +47,6 @@ public class VisualLatencySystem : MonoBehaviour {
 
 	//initialize variables
 	private void Start(){
-		cube = GameObject.Find(CUBE).GetComponent<Test.ColorChanger>();
 		instructions = GameObject.Find(INSTRUCTIONS_OBJ).GetComponent<Text>();
 		helperFill = GameObject.Find(HELPER_OBJ).GetComponent<Image>();
 		lastChangeTime = Time.time;
@@ -69,7 +63,7 @@ public class VisualLatencySystem : MonoBehaviour {
 			helperFill.fillAmount = ((timer - lastChangeTime)/(CHANGE_PERIOD));
 
 			if (timer >= lastChangeTime + CHANGE_PERIOD){
-				cube.ChangeColor();
+				Services.Events.Fire(new BeatEvent(0)); //for the visual latency system, it doesn't matter what beat this is, just that the cube's color change
 				lastChangeTime = Time.time;
 				changeTimes.Add(Time.time);
 			}

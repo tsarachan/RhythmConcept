@@ -1,0 +1,27 @@
+﻿/*
+ * 
+ * BeatDetector sends out one of these events with each beat.
+ * 
+ */
+public class BeatEvent : Event {
+
+
+	////////////////////////////////////////////////
+	/// Fields
+	////////////////////////////////////////////////
+
+
+	//which beat is this?
+	public readonly int beatNumber;
+
+
+	////////////////////////////////////////////////
+	/// Functions
+	////////////////////////////////////////////////
+
+
+	//constructor
+	public BeatEvent(int beatNumber){
+		this.beatNumber = beatNumber;
+	}
+}
