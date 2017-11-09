@@ -92,7 +92,7 @@ public class ScoreManager {
 	/// <summary>
 	/// Step the current score track's color through the colors of a rainbow, backward (VIBGYOR). Start at violet, stop at red.
 	/// </summary>
-	/// <returns>The current score track's color.</returns>
+	/// <returns>The new color.</returns>
 	private Color GetNextColor(){
 		if (currentColor != Rainbow.Red) currentColor++;
 
@@ -101,6 +101,10 @@ public class ScoreManager {
 	}
 
 
+	/// <summary>
+	/// Step the current color backward through the backward rainbow (VIBGYOR). Start at red, end at violet.
+	/// </summary>
+	/// <returns>The new color.</returns>
 	private Color GetPrevColor(){
 		if (currentColor != Rainbow.Violet) currentColor--;
 		if (currentColor == Rainbow.Violet) return colors[(int)Rainbow.Violet];
@@ -133,7 +137,6 @@ public class ScoreManager {
 
 			//if the missAmount was TOO positive, it's a miss
 			else {
-				Debug.Log("Miss");
 				HandleMiss();
 			}
 
@@ -144,9 +147,18 @@ public class ScoreManager {
 	}
 
 
+	/// <summary>
+	/// Set the color and fill amount of the previous and current score tracks after a miss.
+	/// </summary>
 	private void HandleMiss(){
+		//if the current score track is full to at least the MISS amount, just reduce its fill
 		if (currentTrack.fillAmount >= Mathf.Abs(MISS)) currentTrack.fillAmount += MISS;
+
+		//if the current track is at the first color, but it's only slightly full, set it to zero.
 		else if (currentTrack.color == colors[(int)Rainbow.Violet]) currentTrack.fillAmount = NO_FILL;
+
+		//if the current track is not at the first color, and is only slightly full,
+		//set it and the previous track both back a color and then set the current track to be mostly full of the new color
 		else GoToPrev(FULL_FILL + currentTrack.fillAmount + MISS);
 	}
 
@@ -164,6 +176,11 @@ public class ScoreManager {
 	}
 
 
+	/// <summary>
+	/// Decrement the score system by moving the current track backwards through the backwards rainbow (VIBGYOR), stopping at violet,
+	/// and pushing the previous track back a further color.
+	/// </summary>
+	/// <param name="currentFill">The intended fill for the current track after the system is done decrementing the colors.</param>
 	private void GoToPrev(float currentFill){
 		currentTrack.color = GetPrevColor();
 		previousTrack.color = colors[(int)currentColor - 1];
