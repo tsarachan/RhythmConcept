@@ -27,11 +27,8 @@ public class RhythmManager {
 	private const string BUTTON_OBJ = "Button";
 
 
-	#region testing
-
-	private int everyXthBeat = 2; //the game will trigger a button every Xth beat
-
-	#endregion
+	//the game will trigger a button every Xth beat
+	private int everyXthBeat = 2;
 
 
 	////////////////////////////////////////////////
@@ -102,7 +99,7 @@ public class RhythmManager {
 
 			return new Vector2(newSize, newSize);
 		} else {
-			Services.Events.Fire(new ScoreEvent(-1.0f)); //if the button is shrinking to zero, the player has missed the press
+			Services.Events.Fire(new ScoreEvent(ScoreManager.MISS_INDICATOR)); //if the button is shrinking to zero, the player has missed the press
 			return new Vector2(RhythmButton.ZERO, RhythmButton.ZERO);
 		}
 	}
@@ -160,7 +157,7 @@ public class RhythmManager {
 
 			//default initializations
 			shrinkBeats = 1;
-			timer = 0.0f;
+			timer = -1.0f; //don't let Tick() run the button on the frame it's initialized
 		}
 
 
@@ -168,7 +165,7 @@ public class RhythmManager {
 		/// Reset this button after, e.g., the player presses it.
 		/// </summary>
 		public void Reset(){
-			timer = 0.0f;
+			timer = -1.0f;
 			timerImage.rectTransform.sizeDelta = new Vector2(ZERO, ZERO);
 		}
 	}

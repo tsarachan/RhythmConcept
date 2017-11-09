@@ -27,8 +27,8 @@ public class ScoreManager {
 
 	//how close to perfect does the player have to be for each type of score?
 	private const float GREAT_TOLERANCE = 100.0f;
-	private const float OK_TOLERANCE = 250.0f;
-	private const float BAD_TOLERANCE = 1000.0f;
+	private const float OK_TOLERANCE = 1000.0f;
+	private const float BAD_TOLERANCE = 2000.0f;
 	public const float MISS_INDICATOR = 9999.0f; //nonsense value RhythmManager can send to indicate a miss
 
 
@@ -65,7 +65,7 @@ public class ScoreManager {
 		previousTrack.fillAmount = FULL_FILL;
 
 		colors = MakeColors();
-		currentTrack.color = GetCurrentColor();
+		currentTrack.color = GetNextColor();
 
 		Services.Events.Register<ScoreEvent>(DetermineScoreChange);
 	}
@@ -93,10 +93,17 @@ public class ScoreManager {
 	/// Step the current score track's color through the colors of a rainbow, backward (VIBGYOR). Start at violet, stop at red.
 	/// </summary>
 	/// <returns>The current score track's color.</returns>
-	private Color GetCurrentColor(){
+	private Color GetNextColor(){
 		if (currentColor != Rainbow.Red) currentColor++;
 
 		if (currentColor == Rainbow.Red) return colors[(int)Rainbow.Red];
+		return colors[(int)currentColor];
+	}
+
+
+	private Color GetPrevColor(){
+		if (currentColor != Rainbow.Violet) currentColor--;
+		if (currentColor == Rainbow.Violet) return colors[(int)Rainbow.Violet];
 		return colors[(int)currentColor];
 	}
 
@@ -111,17 +118,36 @@ public class ScoreManager {
 		ScoreEvent scoreEvent = e as ScoreEvent;
 
 		if (scoreEvent.missAmount >= 0.0f){
-			if (scoreEvent.missAmount <= GREAT_TOLERANCE) currentTrack.fillAmount += GREAT_SCORE;
-			else if (scoreEvent.missAmount <= OK_TOLERANCE) currentTrack.fillAmount += OK_SCORE;
-			else if (scoreEvent.missAmount <= BAD_TOLERANCE) currentTrack.fillAmount += BAD_SCORE;
+			if (scoreEvent.missAmount <= GREAT_TOLERANCE){
+				currentTrack.fillAmount += GREAT_SCORE;
+				Debug.Log("Great");
+			}
+			else if (scoreEvent.missAmount <= OK_TOLERANCE){
+				currentTrack.fillAmount += OK_SCORE;
+				Debug.Log("OK");
+			}
+			else if (scoreEvent.missAmount <= BAD_TOLERANCE){
+				currentTrack.fillAmount += BAD_SCORE;
+				Debug.Log("Bad");
+			}
 
 			//if the missAmount was TOO positive, it's a miss
-			else currentTrack.fillAmount += MISS;
+			else {
+				Debug.Log("Miss");
+				HandleMiss();
+			}
 
 		//the missAmount was negative, meaning the player pressed the button too late
-		} else currentTrack.fillAmount += MISS;
+		} else HandleMiss();
 
 		if (currentTrack.fillAmount >= FULL_FILL) GoToNext();
+	}
+
+
+	private void HandleMiss(){
+		if (currentTrack.fillAmount >= Mathf.Abs(MISS)) currentTrack.fillAmount += MISS;
+		else if (currentTrack.color == colors[(int)Rainbow.Violet]) currentTrack.fillAmount = NO_FILL;
+		else GoToPrev(FULL_FILL + currentTrack.fillAmount + MISS);
 	}
 
 
@@ -133,7 +159,15 @@ public class ScoreManager {
 		previousTrack.color = colors[(int)currentColor];
 		previousTrack.fillAmount = FULL_FILL;
 
-		currentTrack.color = GetCurrentColor();
+		currentTrack.color = GetNextColor();
 		currentTrack.fillAmount = NO_FILL;
+	}
+
+
+	private void GoToPrev(float currentFill){
+		currentTrack.color = GetPrevColor();
+		previousTrack.color = colors[(int)currentColor - 1];
+		previousTrack.fillAmount = FULL_FILL;
+		currentTrack.fillAmount = currentFill;
 	}
 }
