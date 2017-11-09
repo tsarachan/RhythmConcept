@@ -67,7 +67,7 @@ public class BeatCounter {
 	/// <summary>
 	/// Each frame, determine where we are in the song (in seconds).
 	/// 
-	/// If the song has reached a new beat, change the cube's color and update when the last beat occurred so that
+	/// If the song has reached a new beat, send out an event and update when the last beat occurred so that
 	/// we can detect the next beat.
 	/// </summary>
 	public void Tick(){
@@ -80,7 +80,6 @@ public class BeatCounter {
 		songTime = GetCurrentSongTime();
 
 		if (songTime - startTime >= lastBeatTime + beatDuration){
-			Debug.Log("Beat " + BeatCount);
 			Services.Events.Fire(new BeatEvent(BeatCount));
 			lastBeatTime = (BeatCount * 1.0f + startPlayDelay);
 			BeatCount++;
